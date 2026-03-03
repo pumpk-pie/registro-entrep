@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Materiales</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #F5F5F5;
+            color: #333;
+        }
+
+        header {
+            background-color: #1A1A1A;
+            border-bottom: 4px solid #FDB913;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 24px 16px;
+        }
+
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 {
+            color: #FDB913;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 48px 16px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 4px solid #FDB913;
+        }
+
+        .card h2, .card h3 {
+            color: #1A1A1A;
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 24px;
+        }
+
+        .card h3 {
+            font-size: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1A1A1A;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #1A1A1A;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #FDB913;
+        }
+
+        .materials-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .material-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .material-input input {
+            flex: 1;
+        }
+
+        button {
+            padding: 12px 16px;
+            background-color: #1A1A1A;
+            color: #FDB913;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-remove {
+            padding: 12px 16px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+        }
+
+        .btn-logout {
+            background-color: #FDB913;
+            color: #1A1A1A;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 16px;
+            margin: 16px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: #1A1A1A;
+            font-size: 16px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 32px;
+            height: fit-content;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .grade-section {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 4px solid #FDB913;
+        }
+
+        .grade-header {
+            background-color: #FDB913;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+        }
+
+        .grade-header h3 {
+            font-size: 28px;
+            color: #1A1A1A;
+            margin: 0;
+        }
+
+        .grade-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .month-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .month-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1A1A1A;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #FDB913;
+            margin-bottom: 12px;
+        }
+
+        .request-card {
+            border: 1px solid #1A1A1A;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #F5F5F5;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .request-info p {
+            margin: 0;
+        }
+
+        .request-teacher {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1A1A1A;
+        }
+
+        .request-datetime {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .request-materials {
+            margin-top: 12px;
+        }
+
+        .request-materials p {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            margin: 0 0 8px 0;
+        }
+
+        .materials-ul {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .materials-ul li {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .delete-btn {
+            padding: 8px;
+            background-color: #1A1A1A;
+            color: #FDB913;
+            border-radius: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: #999;
+            font-size: 20px;
+        }
+
+        footer {
+            margin-top: 64px;
+            text-align: center;
+            color: #666;
+            padding-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .add-material-btn {
+            margin-top: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .date-time-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <span style="color: #FDB913; font-size: 32px;">📚</span>
+                <h1>Gestor de Materiales</h1>
+            </div>
+            <button id="logoutBtn" class="btn-logout hidden">Salir</button>
+        </div>
+    </header>
+
+    <div id="successMessage" class="success-message hidden"></div>
+
+    <main>
+        <!-- Página de inicio -->
+        <div id="homePage">
+            <div class="container">
+                <!-- Formulario -->
+                <div class="card">
+                    <h2>📝 Solicitar Materiales</h2>
+                    <div class="form-group">
+                        <div>
+                            <label>👤 Nombre del Profesor</label>
+                            <input type="text" id="teacherName" placeholder="Ej: Juan López">
+                        </div>
+
+                        <div>
+                            <label>📖 Grado</label>
+                            <input type="text" id="grade" placeholder="Ej: 9° A">
+                        </div>
+
+                        <div>
+                            <label>📦 Materiales Solicitados</label>
+                            <div class="materials-list" id="materialsList">
+                                <div class="material-input">
+                                    <input type="text" class="material-input-field" placeholder="Material 1">
+                                </div>
+                            </div>
+                            <button class="add-material-btn" onclick="addMaterialField()">
+                                <span>➕</span> Agregar otro material
+                            </button>
+                        </div>
+
+                        <div class="date-time-grid">
+                            <div>
+                                <label>📅 Fecha</label>
+                                <input type="date" id="date">
+                            </div>
+                            <div>
+                                <label>🕐 Hora</label>
+                                <input type="time" id="time">
+                            </div>
+                        </div>
+
+                        <button class="btn-submit" onclick="submitForm()">✓ Enviar Solicitud</button>
+                    </div>
+                </div>
+
+                <!-- Panel Admin -->
+                <div class="card sidebar">
+                    <h3>🔐 Panel Administrador</h3>
+                    <div class="form-group">
+                        <p style="color: #666; font-size: 14px;">Ingresa tu contraseña para acceder al panel de control</p>
+                        
+                        <div>
+                            <label>Contraseña</label>
+                            <div class="password-input">
+                                <input type="password" id="passwordInput" placeholder="••••••••">
+                                <button class="toggle-password" onclick="togglePassword()">👁️</button>
+                            </div>
+                        </div>
+
+                        <div id="loginError" class="error-message hidden"></div>
+
+                        <button class="btn-login" onclick="loginAdmin()">Acceder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página Admin -->
+        <div id="adminPage" class="hidden">
+            <h2 style="font-size: 28px; font-weight: bold; color: #1A1A1A; margin-bottom: 32px;">📚 Registro de Solicitudes por Grado</h2>
+            <div id="adminContent" class="admin-container"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Sistema de Gestión de Materiales © 2024</p>
+    </footer>
+
+    <script>
+        // Estado
+        let currentPage = 'home';
+        const ADMIN_PASSWORD = 'New-L1fe_2526';
+        let requests = JSON.parse(localStorage.getItem('materialRequests') || '[]');
+
+        // Inicializar
+        document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('time').value = new Date().toTimeString().slice(0, 5);
+
+        // Enviar solicitud
+        function submitForm() {
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const grade = document.getElementById('grade').value.trim();
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            const materialInputs = document.querySelectorAll('.material-input-field');
+            const materials = Array.from(materialInputs).map(input => input.value.trim()).filter(m => m);
+
+            if (!teacherName || !grade || materials.length === 0) {
+                alert('Por favor completa todos los campos requeridos');
+                return;
+            }
+
+            const newRequest = {
+                id: Date.now(),
+                teacherName,
+                grade,
+                materials,
+                date,
+                time
+            };
+
+            requests.push(newRequest);
+            localStorage.setItem('materialRequests', JSON.stringify(requests));
+
+            // Limpiar
+            document.getElementById('teacherName').value = '';
+            document.getElementById('grade').value = '';
+            document.getElementById('materialsList').innerHTML = '<div class="material-input"><input type="text" class="material-input-field" placeholder="Material 1"></div>';
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('time').value = new Date().toTimeString().slice(0, 5);
+
+            showSuccessMessage('¡Solicitud enviada correctamente!');
+        }
+
+        // Agregar material
+        function addMaterialField() {
+            const materialsList = document.getElementById('materialsList');
+            const newInput = document.createElement('div');
+            newInput.className = 'material-input';
+            const count = materialsList.children.length + 1;
+            newInput.innerHTML = `
+                <input type="text" class="material-input-field" placeholder="Material ${count}">
+                <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            `;
+            materialsList.appendChild(newInput);
+        }
+
+        // Mostrar mensaje
+        function showSuccessMessage(msg) {
+            const msgDiv = document.getElementById('successMessage');
+            msgDiv.textContent = '✓ ' + msg;
+            msgDiv.classList.remove('hidden');
+            setTimeout(() => msgDiv.classList.add('hidden'), 3000);
+        }
+
+        // Login
+        function loginAdmin() {
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (password === ADMIN_PASSWORD) {
+                currentPage = 'admin';
+                document.getElementById('homePage').classList.add('hidden');
+                document.getElementById('adminPage').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+                errorDiv.classList.add('hidden');
+                renderAdminPage();
+            } else {
+                errorDiv.textContent = 'Contraseña incorrecta';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').onclick = function() {
+            currentPage = 'home';
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('adminPage').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+        };
+
+        // Renderizar página admin
+        function renderAdminPage() {
+            const gradesByGrade = {};
+            requests.forEach(req => {
+                if (!gradesByGrade[req.grade]) gradesByGrade[req.grade] = [];
+                gradesByGrade[req.grade].push(req);
+            });
+
+            let html = '';
+
+            Object.keys(gradesByGrade).sort().forEach(gradeKey => {
+                html += `
+                    <div class="grade-section">
+                        <div class="grade-header">
+                            <h3>📚 ${gradeKey}</h3>
+                        </div>
+                        <div class="grade-content">
+                `;
+
+                const monthGroups = {};
+                gradesByGrade[gradeKey].forEach(req => {
+                    const [year, month] = req.date.split('-');
+                    const key = `${year}-${month}`;
+                    if (!monthGroups[key]) monthGroups[key] = [];
+                    monthGroups[key].push(req);
+                });
+
+                Object.keys(monthGroups).sort().reverse().forEach(monthKey => {
+                    const monthName = getMonthName(monthKey);
+                    html += `<div class="month-section"><div class="month-title">📅 ${monthName}</div>`;
+
+                    monthGroups[monthKey].forEach(request => {
+                        html += `
+                            <div class="request-card">
+                                <div class="request-header">
+                                    <div class="request-info">
+                                        <p class="request-teacher">${request.teacherName}</p>
+                                        <p class="request-datetime">${request.date} a las ${request.time}</p>
+                                    </div>
+                                    <button class="delete-btn" onclick="deleteRequest(${request.id})">🗑️</button>
+                                </div>
+                                <div class="request-materials">
+                                    <p>Materiales:</p>
+                                    <ul class="materials-ul">
+                                        ${request.materials.map(m => `<li>▶ ${m}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            if (requests.length === 0) {
+                html = '<div class="card empty-state">No hay solicitudes registradas</div>';
+            }
+
+            document.getElementById('adminContent').innerHTML = html;
+        }
+
+        // Eliminar solicitud
+        function deleteRequest(id) {
+            if (confirm('¿Eliminar esta solicitud?')) {
+                requests = requests.filter(r => r.id !== id);
+                localStorage.setItem('materialRequests', JSON.stringify(requests));
+                renderAdminPage();
+            }
+        }
+
+        // Nombre del mes
+        function getMonthName(key) {
+            const [year, month] = key.split('-');
+            const names = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return `${names[parseInt(month) - 1]} ${year}`;
+        }
+
+        // Toggle password
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>
